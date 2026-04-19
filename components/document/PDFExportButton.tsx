@@ -20,7 +20,7 @@ export default function PDFExportButton({ printRef, filename, className }: PDFEx
     if (!printRef.current) return
     
     setIsExporting(true)
-    const exportToastId = toast.loading("Generating your document...")
+    const exportToastId = toast.loading("Sedang membuat dokumen...")
     
     try {
       const element = printRef.current
@@ -58,12 +58,12 @@ export default function PDFExportButton({ printRef, filename, className }: PDFEx
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width
 
       pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight)
-      pdf.save(`${filename || 'document'}.pdf`)
-      toast.success("PDF exported successfully!", { id: exportToastId })
+      pdf.save(`${filename || 'dokumen'}.pdf`)
+      toast.success("PDF berhasil diekspor!", { id: exportToastId })
       
     } catch (error: any) {
       console.error('Error generating PDF:', error)
-      toast.error("Failed to export PDF", {
+      toast.error("Gagal mengekspor PDF", {
         id: exportToastId,
         description: error.message
       })
@@ -82,7 +82,7 @@ export default function PDFExportButton({ printRef, filename, className }: PDFEx
       )}
     >
       {isExporting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Download className="w-5 h-5" />}
-      {isExporting ? "Exporting..." : "Export to PDF"}
+      {isExporting ? "Mengekspor..." : "Ekspor ke PDF"}
     </button>
   )
 }

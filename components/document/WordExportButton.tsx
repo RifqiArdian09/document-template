@@ -2,7 +2,20 @@
 
 import { useState } from 'react'
 import { FileText, Loader2 } from 'lucide-react'
-import { Document, Packer, Paragraph, TextRun, AlignmentType, HeadingLevel, Table, TableRow, TableCell, WidthType, BorderStyle, ImageRun } from 'docx'
+import { 
+  Document, 
+  Packer, 
+  Paragraph, 
+  TextRun, 
+  AlignmentType, 
+  HeadingLevel, 
+  Table, 
+  TableRow, 
+  TableCell, 
+  WidthType, 
+  BorderStyle, 
+  ImageRun
+} from 'docx'
 import { saveAs } from 'file-saver'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
@@ -13,31 +26,84 @@ interface WordExportButtonProps {
   logo?: string | null
   stamp?: string | null
   signature?: string | null
+  background?: string | null
   className?: string
 }
 
-export default function WordExportButton({ state, fields, logo, stamp, signature, className }: WordExportButtonProps) {
+export default function WordExportButton({ state, fields, logo, stamp, signature, background: bgProp, className }: WordExportButtonProps) {
   const [isExporting, setIsExporting] = useState(false)
+  const background = bgProp || state.background_image_url
 
-  const fetchImageBuffer = async (url: string) => {
+  const stripHtml = (html: string) => {
+    if (!html) return ""
+    let text = html.replace(/<\/p>/g, "\n").replace(/<br\s*\/?>/g, "\n")
+    return text.replace(/<[^>]*>?/gm, '').trim()
+  }
+
+  const fetchImage = async (url: string): Promise<Uint8Array | null> => {
     try {
-      const response = await fetch(url)
-      const blob = await response.blob()
-      return await blob.arrayBuffer()
+      const resp = await fetch(url)
+      const buffer = await resp.arrayBuffer()
+      return new Uint8Array(buffer)
     } catch (e) {
-      console.error('Failed to fetch image for Word:', e)
+      console.error("Failed to fetch image:", url, e)
       return null
     }
   }
 
   const handleExport = async () => {
     setIsExporting(true)
-    const toastId = toast.loading("Generating Word document...")
+    const toastId = toast.loading("Mempersiapkan dokumen Word dengan gambar...")
 
     try {
       const children: any[] = []
 
-      // 1. Header Section
+      // --- 0. Background / Watermark (Floating Behind Text) ---
+      if (background) {
+        const bgBuffer = await fetchImage(background)
+        if (bgBuffer) {
+          children.push(
+            new Paragraph({
+              children: [
+                new ImageRun({
+                  data: bgBuffer,
+                  transformation: { width: 500, height: 500 },
+                  floating: {
+                    horizontalPosition: { offset: 0, relative: 'page' as any },
+                    verticalPosition: { offset: 1500000, relative: 'page' as any },
+                    wrap: { type: 'none' as any, side: 'both' as any },
+                    behindText: true,
+                  },
+                } as any),
+              ],
+            })
+          )
+        }
+      }
+
+      // --- 1. Logo Header (Floating In Front of Text) ---
+      if (logo) {
+        const logoBuffer = await fetchImage(logo)
+        if (logoBuffer) {
+          children.push(
+            new Paragraph({
+              children: [
+                new ImageRun({
+                  data: logoBuffer,
+                  transformation: { width: 80, height: 80 },
+                  floating: {
+                    horizontalPosition: { offset: 600000, relative: 'page' as any },
+                    verticalPosition: { offset: 600000, relative: 'page' as any },
+                    wrap: { type: 'none' as any, side: 'both' as any },
+                  },
+                } as any),
+              ],
+            })
+          )
+        }
+      }
+
+      // --- 2. Header Content ---
       if (state.header_company) {
         children.push(
           new Paragraph({
@@ -69,18 +135,17 @@ export default function WordExportButton({ state, fields, logo, stamp, signature
         )
       }
 
-      // Border line
       children.push(new Paragraph({ children: [new TextRun({ text: "" })], border: { bottom: { color: "000000", space: 1, style: BorderStyle.DOUBLE, size: 6 } } }))
       children.push(new Paragraph({ spacing: { before: 200 } }))
 
-      // 2. Title & Number
+      // --- 3. Title & Number ---
       children.push(
         new Paragraph({
           alignment: AlignmentType.CENTER,
           heading: HeadingLevel.HEADING_2,
           children: [
             new TextRun({
-              text: (state.title || "DOCUMENT TITLE").toUpperCase(),
+              text: (state.title || "JUDUL DOKUMEN").toUpperCase(),
               bold: true,
               underline: {},
               size: 28,
@@ -101,14 +166,15 @@ export default function WordExportButton({ state, fields, logo, stamp, signature
         })
       )
 
-      // 3. Body Content
+      // --- 4. Content ---
       if (state.body_content) {
+        const cleanContent = stripHtml(state.body_content)
         children.push(
           new Paragraph({
             alignment: AlignmentType.JUSTIFIED,
             children: [
               new TextRun({
-                text: state.body_content,
+                text: cleanContent,
                 size: 24,
                 font: "Times New Roman"
               }),
@@ -118,7 +184,7 @@ export default function WordExportButton({ state, fields, logo, stamp, signature
         )
       }
 
-      // 4. Dynamic Fields (Table)
+      // --- 5. Fields ---
       if (fields.length > 0) {
         const rows = fields.map(f => new TableRow({
           children: [
@@ -140,14 +206,44 @@ export default function WordExportButton({ state, fields, logo, stamp, signature
           ]
         }))
 
-        children.push(new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, borders: BorderStyle.NONE, rows: rows }))
+        children.push(new Table({ 
+          width: { size: 100, type: WidthType.PERCENTAGE }, 
+          borders: {
+            top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE },
+            insideHorizontal: { style: BorderStyle.NONE }, insideVertical: { style: BorderStyle.NONE },
+          }, 
+          rows: rows 
+        }))
         children.push(new Paragraph({ spacing: { before: 400 } }))
       }
 
-      // 5. Signature Section (Right Aligned)
+      if (state.closing_content) {
+        const cleanClosing = stripHtml(state.closing_content)
+        children.push(
+          new Paragraph({
+            alignment: AlignmentType.JUSTIFIED,
+            children: [
+              new TextRun({
+                text: cleanClosing,
+                size: 24,
+                font: "Times New Roman"
+              }),
+            ],
+            spacing: { before: 300, after: 300, line: 360 }
+          })
+        )
+      }
+
+      // --- 6. Signature Area ---
+      const ttdAlign = state.ttd_align === 'center' ? AlignmentType.CENTER : 
+                       state.ttd_align === 'left' ? AlignmentType.LEFT : AlignmentType.RIGHT;
+
+      const sigBuffer = signature ? await fetchImage(signature) : null
+      const capBuffer = stamp ? await fetchImage(stamp) : null
+
       children.push(
         new Paragraph({
-          alignment: AlignmentType.RIGHT,
+          alignment: ttdAlign,
           children: [
             new TextRun({
               text: `${state.ttd_lokasi || 'Lokasi'}, ${state.ttd_tanggal || 'Tanggal'}`,
@@ -155,25 +251,35 @@ export default function WordExportButton({ state, fields, logo, stamp, signature
               font: "Times New Roman"
             }),
           ],
-        }),
-        new Paragraph({
-          alignment: AlignmentType.RIGHT,
-          children: [
-            new TextRun({
-              text: state.ttd_jabatan || 'Jabatan',
-              bold: true,
-              size: 24,
-              font: "Times New Roman"
-            }),
-          ],
-          spacing: { after: 800 }
+          spacing: { after: 200 }
         })
       )
 
-      // Signature Name
+      // Signature & Stamp Images (if any)
+      if (sigBuffer || capBuffer) {
+        const sigRuns: any[] = []
+        if (sigBuffer) {
+          sigRuns.push(new ImageRun({ data: sigBuffer, transformation: { width: 120, height: 60 } } as any))
+        }
+        if (capBuffer) {
+          sigRuns.push(new ImageRun({ 
+            data: capBuffer, 
+            transformation: { width: 80, height: 80 },
+            floating: {
+                horizontalPosition: { offset: -300000, relative: 'column' as any },
+                verticalPosition: { offset: -200000, relative: 'paragraph' as any },
+                wrap: { type: 'none' as any, side: 'both' as any },
+            }
+          } as any))
+        }
+        children.push(new Paragraph({ alignment: ttdAlign, children: sigRuns, spacing: { after: 200 } }))
+      } else {
+        children.push(new Paragraph({ spacing: { after: 800 } }))
+      }
+
       children.push(
         new Paragraph({
-          alignment: AlignmentType.RIGHT,
+          alignment: ttdAlign,
           children: [
             new TextRun({
               text: state.ttd_nama || 'Nama Terang',
@@ -183,11 +289,23 @@ export default function WordExportButton({ state, fields, logo, stamp, signature
               font: "Times New Roman"
             }),
           ],
+        }),
+        new Paragraph({
+          alignment: ttdAlign,
+          children: [
+            new TextRun({
+              text: state.ttd_jabatan || 'Jabatan',
+              bold: true,
+              size: 24,
+              font: "Times New Roman"
+            }),
+          ],
         })
       )
 
-      // 6. Footer
+      // --- 7. Footer ---
       if (state.footer_text) {
+        const cleanFooter = stripHtml(state.footer_text)
         children.push(
           new Paragraph({
             spacing: { before: 1000 },
@@ -195,7 +313,7 @@ export default function WordExportButton({ state, fields, logo, stamp, signature
             alignment: AlignmentType.CENTER,
             children: [
               new TextRun({
-                text: state.footer_text,
+                text: cleanFooter,
                 size: 18,
                 font: "Times New Roman",
                 italics: true
@@ -205,21 +323,16 @@ export default function WordExportButton({ state, fields, logo, stamp, signature
         )
       }
 
-      const doc = new Document({
-        sections: [
-          {
-            properties: {},
-            children: children,
-          },
-        ],
+      const docBlob = new Document({
+        sections: [{ properties: {}, children: children }],
       })
 
-      const blob = await Packer.toBlob(doc)
-      saveAs(blob, `${state.title || 'document'}.docx`)
-      toast.success("Word document exported successfully!", { id: toastId })
+      const blob = await Packer.toBlob(docBlob)
+      saveAs(blob, `${state.title || 'dokumen'}.docx`)
+      toast.success("Dokumen Word berhasil diekspor!", { id: toastId })
     } catch (e: any) {
       console.error('Word Export Error:', e)
-      toast.error("Failed to export Word document", { id: toastId, description: e.message })
+      toast.error("Gagal mengekspor dokumen Word", { id: toastId, description: e.message })
     } finally {
       setIsExporting(false)
     }
@@ -235,7 +348,7 @@ export default function WordExportButton({ state, fields, logo, stamp, signature
       )}
     >
       {isExporting ? <Loader2 className="size-5 animate-spin" /> : <FileText className="size-5 text-blue-500" />}
-      {isExporting ? "Converting..." : "Export to Word"}
+      {isExporting ? "Mengonversi..." : "Ekspor ke Word"}
     </button>
   )
 }

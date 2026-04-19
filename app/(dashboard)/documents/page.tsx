@@ -73,12 +73,12 @@ export default function DocumentsPage() {
           user_id: userData.user.id,
           action: 'delete',
           module: 'document',
-          description: `Deleted document with ID: ${deleteId}`
+          description: `Menghapus dokumen dengan ID: ${deleteId}`
         })
       }
-      toast.success("Document deleted successfully")
+      toast.success("Dokumen berhasil dihapus")
     } else {
-      toast.error("Failed to delete document")
+      toast.error("Gagal menghapus dokumen")
     }
     setDeleteId(null)
   }
@@ -87,8 +87,8 @@ export default function DocumentsPage() {
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-foreground">Document Directory</h1>
-          <p className="text-secondary mt-1">Manage and search your generated official paperwork.</p>
+          <h1 className="text-3xl font-extrabold tracking-tight text-foreground">Direktori Dokumen</h1>
+          <p className="text-secondary mt-1">Kelola dan cari dokumen resmi yang telah Anda buat.</p>
         </div>
         <div className="flex gap-2">
            <Button variant="outline" className="rounded-full px-6 h-12 font-bold shadow-sm">
@@ -98,7 +98,7 @@ export default function DocumentsPage() {
            <Button asChild className="rounded-full px-6 h-12 bg-primary text-white hover:bg-primary/90 font-bold shadow-lg shadow-primary/20">
              <Link href="/documents/create">
                <Plus className="w-4 h-4 mr-2" />
-               New Document
+               Dokumen Baru
              </Link>
            </Button>
         </div>
@@ -108,7 +108,7 @@ export default function DocumentsPage() {
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full">
            <div className="relative flex-1 w-full">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-secondary/40" />
-              <input placeholder="Search files by title or reference number..." className="w-full pl-12 pr-6 h-14 bg-card border-none rounded-[20px] shadow-sm text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium" />
+              <input placeholder="Cari berdasarkan judul atau nomor surat..." className="w-full pl-12 pr-6 h-14 bg-card border-none rounded-[20px] shadow-sm text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium" />
            </div>
         </div>
 
@@ -117,10 +117,10 @@ export default function DocumentsPage() {
             <Table>
               <TableHeader className="bg-muted/30">
                 <TableRow className="hover:bg-transparent border-none">
-                  <TableHead className="px-8 py-5 text-xs font-bold uppercase tracking-widest text-secondary">Document</TableHead>
-                  <TableHead className="px-8 py-5 text-xs font-bold uppercase tracking-widest text-secondary">Ref. No</TableHead>
-                  <TableHead className="px-8 py-5 text-xs font-bold uppercase tracking-widest text-secondary">Created On</TableHead>
-                  <TableHead className="px-8 py-5 text-xs font-bold uppercase tracking-widest text-secondary text-right">Actions</TableHead>
+                  <TableHead className="px-8 py-5 text-xs font-bold uppercase tracking-widest text-secondary">Dokumen</TableHead>
+                  <TableHead className="px-8 py-5 text-xs font-bold uppercase tracking-widest text-secondary">No. Ref</TableHead>
+                  <TableHead className="px-8 py-5 text-xs font-bold uppercase tracking-widest text-secondary">Dibuat Pada</TableHead>
+                  <TableHead className="px-8 py-5 text-xs font-bold uppercase tracking-widest text-secondary text-right">Aksi</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody className="divide-y divide-border/50">
@@ -129,7 +129,7 @@ export default function DocumentsPage() {
                     <TableCell colSpan={4} className="h-40 text-center">
                       <div className="flex flex-col items-center justify-center gap-3">
                         <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-                        <p className="text-sm font-bold text-secondary">Retrieving records...</p>
+                        <p className="text-sm font-bold text-secondary">Mengambil data...</p>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -142,8 +142,8 @@ export default function DocumentsPage() {
                             <FileText className="w-6 h-6" />
                           </div>
                           <div className="flex flex-col">
-                            <span className="font-bold text-foreground text-base">{doc.title || 'Untitled'}</span>
-                            <span className="text-[10px] text-primary font-bold uppercase tracking-tighter">Official Doc</span>
+                            <span className="font-bold text-foreground text-base">{doc.title || 'Tanpa Judul'}</span>
+                            <span className="text-[10px] text-primary font-bold uppercase tracking-tighter">Dokumen Resmi</span>
                           </div>
                         </div>
                       </TableCell>
@@ -155,7 +155,7 @@ export default function DocumentsPage() {
                       <TableCell className="px-8 py-5">
                         <div className="flex items-center gap-2 text-secondary font-semibold text-sm">
                            <Calendar className="w-4 h-4 opacity-40" />
-                           {new Date(doc.created_at).toLocaleDateString(undefined, {
+                           {new Date(doc.created_at).toLocaleDateString('id-ID', {
                              year: 'numeric', month: 'short', day: 'numeric'
                            })}
                         </div>
@@ -168,16 +168,16 @@ export default function DocumentsPage() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-[180px] rounded-2xl p-2 border-border shadow-2xl">
-                            <DropdownMenuLabel className="px-3 py-2 text-[10px] font-bold uppercase text-secondary">Management</DropdownMenuLabel>
+                            <DropdownMenuLabel className="px-3 py-2 text-[10px] font-bold uppercase text-secondary">Manajemen</DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem asChild>
                               <Link href={`/documents/${doc.id}`} className="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-muted transition-colors font-medium">
-                                <Eye className="h-4 w-4 text-primary" /> View Details
+                                <Eye className="h-4 w-4 text-primary" /> Lihat Detail
                               </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
                               <Link href={`/documents/${doc.id}`} className="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-muted transition-colors font-medium text-success-dark">
-                                <Download className="h-4 w-4" /> Export PDF
+                                <Download className="h-4 w-4" /> Ekspor ke PDF
                               </Link>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
@@ -185,7 +185,7 @@ export default function DocumentsPage() {
                               className="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-destructive/10 text-destructive transition-colors font-bold"
                               onClick={() => setDeleteId(doc.id)}
                             >
-                              <Trash2 className="h-4 w-4" /> Remove
+                              <Trash2 className="h-4 w-4" /> Hapus
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -197,7 +197,7 @@ export default function DocumentsPage() {
                     <TableCell colSpan={4} className="h-48 text-center">
                       <div className="flex flex-col items-center justify-center opacity-40">
                         <FileText className="w-16 h-16 mb-2" />
-                        <p className="font-bold">No documents matching the criteria.</p>
+                        <p className="font-bold">Tidak ada dokumen yang ditemukan.</p>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -211,15 +211,15 @@ export default function DocumentsPage() {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent className="rounded-3xl p-8">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-2xl font-extrabold text-foreground">Confirm Removal</AlertDialogTitle>
+            <AlertDialogTitle className="text-2xl font-extrabold text-foreground">Konfirmasi Penghapusan</AlertDialogTitle>
             <AlertDialogDescription className="text-secondary font-medium mt-2">
-              This will permanently delete the selected document. This action is irreversible.
+              Ini akan menghapus dokumen yang dipilih secara permanen. Tindakan ini tidak dapat dibatalkan.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-8 gap-4">
-            <AlertDialogCancel className="rounded-full px-6 h-12 font-bold border-border hover:bg-muted">Discard</AlertDialogCancel>
+            <AlertDialogCancel className="rounded-full px-6 h-12 font-bold border-border hover:bg-muted">Batal</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="rounded-full px-6 h-12 bg-destructive text-white font-bold hover:bg-destructive/90">
-              Confirm Delete
+              Hapus Sekarang
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

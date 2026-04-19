@@ -5,11 +5,10 @@ import { usePathname } from 'next/navigation'
 import { 
   LayoutDashboard, 
   FileText, 
-  AppWindow, 
+  Layout, 
   Activity, 
   LogOut, 
   Settings, 
-  ShieldCheck, 
   LifeBuoy,
   Sun,
   Moon
@@ -20,11 +19,11 @@ import { useTheme } from "next-themes"
 import { useEffect, useState } from 'react'
 
 const navigation = [
-  { name: 'Overview', href: '/dashboard', icon: LayoutDashboard, category: 'Organization' },
-  { name: 'Documents', href: '/documents', icon: FileText, category: 'Organization' },
-  { name: 'Templates', href: '/templates', icon: AppWindow, category: 'Organization' },
-  { name: 'Activity Log', href: '/activity-logs', icon: Activity, category: 'Management' },
-  { name: 'Settings', href: '/settings', icon: Settings, category: 'Management' },
+  { name: 'Beranda', href: '/dashboard', icon: LayoutDashboard, category: 'Organisasi' },
+  { name: 'Direktori Dokumen', href: '/documents', icon: FileText, category: 'Organisasi' },
+  { name: 'Template Dokumen', href: '/templates', icon: Layout, category: 'Organisasi' },
+  { name: 'Log Aktivitas', href: '/activity-logs', icon: Activity, category: 'Manajemen' },
+  { name: 'Pengaturan', href: '/settings', icon: Settings, category: 'Manajemen' },
 ]
 
 export default function Sidebar() {
@@ -32,7 +31,6 @@ export default function Sidebar() {
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
-  // Avoid hydration mismatch
   useEffect(() => {
     setMounted(true)
   }, [])
@@ -97,22 +95,22 @@ export default function Sidebar() {
       <div className="absolute bottom-0 left-0 w-full bg-white dark:bg-zinc-900 border-t border-border dark:border-zinc-800 p-5">
         <div className="flex items-center justify-between gap-3 bg-muted/30 dark:bg-zinc-800/50 p-3 rounded-2xl">
           <div className="min-w-0 flex-1">
-            <p className="font-bold text-foreground dark:text-white text-sm truncate">Sarah Connor</p>
+            <p className="font-bold text-foreground dark:text-white text-sm truncate">User Profile</p>
             <div className="flex items-center gap-2 mt-1">
               <button 
                 onClick={() => logout()}
                 className="text-[10px] text-secondary hover:text-primary transition-colors font-bold uppercase tracking-wider"
               >
-                Sign Out
+                Keluar
               </button>
               <span className="size-1 bg-secondary/30 rounded-full" />
               {mounted && (
                 <button 
-                  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                  className="text-[10px] text-secondary hover:text-primary transition-colors font-bold uppercase tracking-wider flex items-center gap-1"
+                   onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                   className="text-[10px] text-secondary hover:text-primary transition-colors font-bold uppercase tracking-wider flex items-center gap-1"
                 >
                   {theme === 'dark' ? <Sun className="size-3" /> : <Moon className="size-3" />}
-                  {theme === 'dark' ? 'Light' : 'Dark'}
+                  {theme === 'dark' ? 'Terang' : 'Gelap'}
                 </button>
               )}
             </div>

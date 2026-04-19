@@ -2,52 +2,59 @@ import { login, signup } from './actions'
 
 export default function LoginPage() {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 p-4">
-      <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-        <div className="mb-6 text-center">
-          <h1 className="text-2xl font-bold text-gray-900">DocumentFlow</h1>
-          <p className="text-gray-500 mt-1">Sign in to your account</p>
+    <div className="flex items-center justify-center min-h-screen bg-zinc-50/50 p-4 font-sans">
+      <div className="w-full max-w-md bg-white p-10 rounded-[40px] shadow-2xl shadow-zinc-200/50 border border-zinc-100 animate-in fade-in zoom-in-95 duration-700">
+        <div className="mb-10 text-center">
+          <div className="size-16 bg-zinc-900 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-zinc-900/10 transition-transform hover:scale-110">
+             <div className="size-8 border-4 border-white border-t-transparent rounded-full animate-pulse" />
+          </div>
+          <h1 className="text-3xl font-black tracking-tight text-zinc-900">DocuForge</h1>
+          <p className="text-zinc-500 mt-2 font-medium">Masuk ke akun Anda</p>
         </div>
         
-        <form className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="email">Email</label>
+        <form className="space-y-6">
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase text-zinc-400 tracking-widest pl-1" htmlFor="email">Alamat Email</label>
             <input
               id="email"
               name="email"
               type="email"
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-              placeholder="you@email.com"
+              className="w-full px-6 py-4 bg-zinc-50 border-none rounded-2xl focus:ring-2 focus:ring-zinc-900/10 outline-none transition-all font-medium text-zinc-900 placeholder:text-zinc-300"
+              placeholder="nama@perusahaan.com"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="password">Password</label>
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase text-zinc-400 tracking-widest pl-1" htmlFor="password">Kata Sandi</label>
             <input
               id="password"
               name="password"
               type="password"
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+              className="w-full px-6 py-4 bg-zinc-50 border-none rounded-2xl focus:ring-2 focus:ring-zinc-900/10 outline-none transition-all font-medium text-zinc-900 placeholder:text-zinc-300"
               placeholder="••••••••"
             />
           </div>
           
-          <div className="pt-2 flex flex-col gap-3">
+          <div className="pt-4 flex flex-col gap-4">
             <button
               formAction={login}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex justify-center items-center"
+              className="w-full h-14 bg-zinc-900 hover:bg-zinc-800 text-white font-black rounded-full shadow-xl shadow-zinc-900/20 transition-all hover:scale-[1.02] active:scale-[0.98] flex justify-center items-center text-base"
             >
-              Log in
+              Masuk
             </button>
             <button
               formAction={signup}
-              className="w-full bg-white hover:bg-gray-50 text-blue-600 border border-blue-600 font-medium py-2 px-4 rounded-lg transition-colors flex justify-center items-center"
+              className="w-full h-14 bg-white hover:bg-zinc-50 text-zinc-900 border-2 border-zinc-100 font-black rounded-full transition-all hover:scale-[1.02] active:scale-[0.98] flex justify-center items-center text-base"
             >
-              Sign up
+              Daftar Baru
             </button>
           </div>
         </form>
+        
+        <p className="mt-8 text-center text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
+           &copy; 2026 DocuForge System
+        </p>
       </div>
     </div>
   )

@@ -30,7 +30,10 @@ CREATE TABLE documents (
   ttd_image_url text,
   cap_image_url text,
 
+  closing_content text,
   footer_text text,
+  background_image_url text,
+  ttd_align text default 'right',
 
   created_at timestamp with time zone default now(),
   updated_at timestamp with time zone default now()
@@ -40,16 +43,24 @@ CREATE TABLE documents (
 -- Menyimpan layout struktur template kasar (jika reusable).
 CREATE TABLE templates (
   id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete cascade,
   name text,
 
   header_company text,
   header_subtext text,
 
   body_structure jsonb, 
+  closing_content text,
   footer_text text,
+  background_image_url text,
+  ttd_align text default 'right',
 
   created_at timestamp with time zone default now()
 );
+
+-- RLS Policies for Templates
+ALTER TABLE templates ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can manage their own templates" ON templates FOR ALL TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
 -- 3. Tabel Document Fields (Dynamic input)
 -- Menyimpan record input label & value untuk list format dinamis.
